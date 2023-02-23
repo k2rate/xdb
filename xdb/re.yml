@@ -1,0 +1,12 @@
+type: static-library
+name: xdb
+
+deps:
+  - global:k2rate/ulib [/ulib]
+  - global:k2rate/ulib-fmt [/ulib-fmt]
+  - conan:mysql-connector-c@6.1.11
+
+cxxenv.msvc:
+  cxx-link-deps:
+    - Advapi32.lib
+    - gdi32.lib
