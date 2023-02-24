@@ -6,6 +6,7 @@ int main()
 {
     try
     {
+        xdb::str(u8"ky");
         xdb::Connection sql(u8"localhost", u8"root", u8"", u8"laravel", 3306);
 
         if (sql.Scalar(u8"select count(*) FROM users WHERE id = 1")->AsInt())

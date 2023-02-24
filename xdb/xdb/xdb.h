@@ -153,5 +153,5 @@ namespace xdb
         MYSQL *mSQL;
     };
 
-    inline ulib::u8string str(ulib::u8string_view view);
+    ulib::u8string str(ulib::u8string_view view);
 } // namespace xdb
