@@ -1,13 +1,30 @@
 #include "ulib/fmt/format.h"
+#include <fmt/chrono.h>
 #include <stdexcept>
 #include <xdb/xdb.h>
+
 
 int main()
 {
     try
     {
-        xdb::str(u8"ky");
         xdb::Connection sql(u8"localhost", u8"root", u8"", u8"laravel", 3306);
+
+        {
+            xdb::Connection sql(u8"localhost", u8"root", u8"", u8"netunit", 3306);
+
+            auto result = sql.Select(u8"SELECT * FROM `activations`");
+            for (auto &row : result)
+            {
+                auto id = row[u8"id"].AsInt();
+                auto cheatName = row[u8"cheat_name"].AsString();
+                auto timeEnd = row[u8"time_end"].AsInt();
+                auto key = row[u8"key"].AsInt();
+
+                fmt::print("[{}] [{}] [{}] until {}\n", id, cheatName, key,
+                           ulib::format(u8"[{:%Y-%m-%d %H:%M:%S}] ", fmt::localtime(timeEnd)));
+            }
+        }
 
         if (sql.Scalar(u8"select count(*) FROM users WHERE id = 1")->AsInt())
         {

@@ -49,7 +49,7 @@ namespace xdb
         throw std::runtime_error("Invalid MYSQL type [is not an integer]");
     }
 
-    Value Row::Get(ulib::u8string_view name) const
+    const Value& Row::Find(ulib::u8string_view name) const
     {
         size_t index = 0;
         for (auto field : mFields)
@@ -61,14 +61,6 @@ namespace xdb
         }
 
         throw std::runtime_error("unknown name of row element");
-    }
-
-    Value Row::Get(size_t i) const
-    {
-        if(mValues.Size() <= i)
-            throw std::runtime_error("Row::Get length error");
-
-        return mValues.At(i);
     }
 
     Connection::Connection(ulib::u8string_view host, ulib::u8string_view user, ulib::u8string_view password,
