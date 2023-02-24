@@ -9,7 +9,9 @@
 #include <ulib/u8.h>
 
 #include <mysql.h>
+#include <optional>
 #include <string.h>
+
 
 namespace xdb
 {
@@ -116,27 +118,33 @@ namespace xdb
         }
 
         template <typename... T>
-        Row Single(ulib::u8string_view fmt, T &&...args)
+        std::optional<Row> Single(ulib::u8string_view fmt, T &&...args)
         {
             ulib::u8string query = ulib::format(fmt, args...);
             auto result = SelectImpl(query);
 
-            if (result.GetRows().Empty())
-                throw std::runtime_error("No rows returned in .SelectFirst");
+            auto &rows = result.GetRows();
+            if (rows.Empty())
+                return std::nullopt_t({});
 
-            return result.GetRows().At(0);
+            return rows.Front();
         }
 
         template <typename... T>
-        Value Scalar(ulib::u8string_view fmt, T &&...args)
+        std::optional<Value> Scalar(ulib::u8string_view fmt, T &&...args)
         {
             ulib::u8string query = ulib::format(fmt, args...);
             auto result = SelectImpl(query);
 
-            if (result.GetRows().Empty())
-                throw std::runtime_error("No rows returned in .Scalar");
+            auto &rows = result.GetRows();
+            if (rows.Empty())
+                return std::nullopt_t({});
 
-            return result.GetRows().At(0).Get(0);
+            auto &row = rows.Front();
+            if (row.Values().Empty())
+                return std::nullopt_t({});
+
+            return row.Values().Front();
         }
 
         Result SelectImpl(ulib::u8string_view query);
