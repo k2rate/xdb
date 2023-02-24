@@ -7,25 +7,37 @@ int main()
     try
     {
         xdb::Connection sql(u8"localhost", u8"root", u8"", u8"laravel", 3306);
-        auto result = sql.Query(u8"CREATE DATABASE pizdec");
-        auto fields = result.GetFields();
 
-        for (auto row : result.GetRows())
+        if (sql.Scalar(u8"select count(*) FROM users WHERE id = 1").AsInt())
         {
-            size_t index = 0;
-            for (auto field : row.Values())
-            {
-                fmt::print("[{}]: {}\n", fields[index].GetName(), field.AsString());
-                index++;
-            }
+            fmt::print("table users is exists\n");
+        }
+        else
+        {
+            fmt::print("table users does not exists\n");
+        }
 
-            fmt::print("\n");
+        {
+            auto result = sql.Select(u8"CREATE DATABASE pizdec");
+            auto fields = result.GetFields();
+
+            for (auto row : result.GetRows())
+            {
+                size_t index = 0;
+                for (auto field : row.Values())
+                {
+                    fmt::print("[{}]: {}\n", fields[index].GetName(), field.AsString());
+                    index++;
+                }
+
+                fmt::print("\n");
+            }
         }
     }
     catch (const std::runtime_error &error)
     {
         fmt::print("error: {}\n", error.what());
     }
-    
+
     return 0;
 }
