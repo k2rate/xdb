@@ -49,7 +49,7 @@ namespace xdb
         throw std::runtime_error("Invalid MYSQL type [is not an integer]");
     }
 
-    const Value& Row::Find(ulib::u8string_view name) const
+    const Value &Row::Find(ulib::u8string_view name) const
     {
         size_t index = 0;
         for (auto field : mFields)
@@ -163,7 +163,8 @@ namespace xdb
         for (auto ch : view)
         {
             if (ch == '\'' || ch == '\"')
-                escaped.push_back(ch);
+                escaped.push_back('\\');
+            escaped.push_back(ch);
         }
 
         return ulib::format(u8"\'{}\'", escaped);

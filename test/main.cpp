@@ -8,6 +8,10 @@ int main()
 {
     try
     {
+        fmt::print("{}\n", xdb::str(u8"hi"));
+        fmt::print("{}\n", xdb::str(u8"hi'"));
+        
+
         xdb::Connection sql(u8"localhost", u8"root", u8"", u8"laravel", 3306);
 
         {
