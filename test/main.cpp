@@ -16,6 +16,9 @@ int main()
 
         {
             xdb::Connection sql(u8"localhost", u8"root", u8"", u8"netunit", 3306);
+            sql.SetQueryListener([] (ulib::u8string_view query) {
+                fmt::print("[sql] {} \n", query);
+            });
 
             auto result = sql.Select(u8"SELECT * FROM `activations`");
             for (auto &row : result)

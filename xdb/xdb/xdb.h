@@ -11,6 +11,7 @@
 #include <mysql.h>
 #include <optional>
 #include <string.h>
+#include <functional>
 
 namespace xdb
 {
@@ -161,6 +162,11 @@ namespace xdb
             SelectImpl(query);
         }
 
+        void SetQueryListener(std::function<void(ulib::u8string_view)> listener)
+        {
+            mQueryListener = listener;
+        }
+
         template <typename... T>
         Result Select(ulib::u8string_view fmt, T &&...args)
         {
@@ -201,6 +207,7 @@ namespace xdb
 
     private:
         MYSQL *mSQL;
+        std::function<void(ulib::u8string_view)> mQueryListener;
     };
 
     ulib::u8string str(ulib::u8string_view view);

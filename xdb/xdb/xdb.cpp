@@ -66,10 +66,12 @@ namespace xdb
     Connection::Connection(ulib::u8string_view host, ulib::u8string_view user, ulib::u8string_view password,
                            ulib::u8string_view db, ushort port)
     {
+        mQueryListener = [] (ulib::u8string_view) {};
+
         mSQL = mysql_init(nullptr);
         if (!mSQL)
             throw std::runtime_error("mysql init failed");
-        
+
         bool reconnect = true;
         if(mysql_options(mSQL, MYSQL_OPT_RECONNECT, &reconnect))
             throw std::runtime_error("mysql_options failed");
@@ -89,6 +91,8 @@ namespace xdb
 
     Result Connection::SelectImpl(ulib::u8string_view query)
     {
+        mQueryListener(query);
+
         if (mysql_query(mSQL, ulib::str(query).c_str()) != 0)
             throw std::runtime_error(ulib::format("mysql_query failed: {}", mysql_error(mSQL)));
 
