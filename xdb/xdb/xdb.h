@@ -102,6 +102,13 @@ namespace xdb
         ~Connection();
 
         template <typename... T>
+        void Query(ulib::u8string_view fmt, T &&...args)
+        {
+            ulib::u8string query = ulib::format(fmt, args...);
+            SelectImpl(query);
+        }
+
+        template <typename... T>
         Result Select(ulib::u8string_view fmt, T &&...args)
         {
             ulib::u8string query = ulib::format(fmt, args...);
