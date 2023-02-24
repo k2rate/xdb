@@ -69,6 +69,10 @@ namespace xdb
         mSQL = mysql_init(nullptr);
         if (!mSQL)
             throw std::runtime_error("mysql init failed");
+        
+        bool reconnect = true;
+        if(mysql_options(mSQL, MYSQL_OPT_RECONNECT, &reconnect))
+            throw std::runtime_error("mysql_options failed");
 
         if (!mysql_real_connect(mSQL, ulib::str(host).c_str(), ulib::str(user).c_str(), ulib::str(password).c_str(),
                                 ulib::str(db).c_str(), port, nullptr, 0))
