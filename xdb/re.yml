@@ -2,9 +2,9 @@ type: static-library
 name: xdb
 
 deps:
-  - global:k2rate/ulib [/ulib]
-  - global:k2rate/ulib-fmt [/ulib-fmt]
-  - conan:mysql-connector-c@6.1.11
+  - github:k2rate/ulib ^2.5.4 [/ulib]
+  - github:k2rate/ulib-fmt ^2.0.2 [/ulib-fmt]
+  - conan:mysql-connector-c ^6.1.11
 
 cxxenv.msvc:
   cxx-link-deps:
