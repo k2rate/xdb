@@ -46,10 +46,10 @@ namespace xdb
         throw std::runtime_error("Invalid MYSQL type [is not an integer]");
     }
 
-    Value Row::Get(ulib::string_view name) const
+    const Value &Row::Get(ulib::string_view name) const
     {
         size_t index = 0;
-        for (auto field : mFields)
+        for (const auto &field : mFields)
         {
             if (field.GetName() == name)
                 return mValues[index];
@@ -60,7 +60,7 @@ namespace xdb
         throw std::runtime_error("unknown name of row element");
     }
 
-    Value Row::Get(size_t i) const
+    const Value &Row::Get(size_t i) const
     {
         if (mValues.Size() <= i)
             throw std::runtime_error("Row::Get length error");
@@ -90,6 +90,8 @@ namespace xdb
 
     Result Connection::SelectImpl(ulib::string_view query)
     {
+        mQueryListener(query);
+
         if (mysql_query((MYSQL *)mSQL, ulib::str(query).c_str()) != 0)
             throw std::runtime_error(ulib::format("mysql_query failed: {}", mysql_error((MYSQL *)mSQL)));
 
@@ -164,6 +166,7 @@ namespace xdb
 
     void Connection::QueryImpl(ulib::string_view query)
     {
+        mQueryListener(query);
         if (mysql_query((MYSQL *)mSQL, ulib::str(query).c_str()) != 0)
             throw std::runtime_error(ulib::format("mysql_query failed: {}", mysql_error((MYSQL *)mSQL)));
     }
