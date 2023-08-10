@@ -1,15 +1,10 @@
 #pragma once
 
-#include "ulib/encodings/utf8/stringview.h"
-#include "ulib/fmt/format.h"
 #include <stdexcept>
+
 #include <ulib/format.h>
 #include <ulib/list.h>
 #include <ulib/string.h>
-#include <ulib/u8.h>
-
-#include <mysql.h>
-#include <string.h>
 
 namespace xdb
 {
@@ -20,18 +15,18 @@ namespace xdb
         Undefined
     };
 
-    ulib::u8string ToString(FieldType type);
+    ulib::string ToString(FieldType type);
 
     class Field
     {
     public:
-        Field(ulib::u8string_view name, FieldType type) : mName(name), mType(type) {}
+        Field(ulib::string_view name, FieldType type) : mName(name), mType(type) {}
 
-        ulib::u8string_view GetName() const { return mName; }
+        ulib::string_view GetName() const { return mName; }
         FieldType GetType() const { return mType; }
 
     private:
-        ulib::u8string mName;
+        ulib::string mName;
         FieldType mType;
     };
 
@@ -40,17 +35,17 @@ namespace xdb
     class Value
     {
     public:
-        Value(ulib::u8string_view strval);
+        Value(ulib::string_view strval);
         Value(uint64 ival);
 
-        ulib::u8string AsString() const;
+        ulib::string AsString() const;
         uint64 AsInt() const;
 
         FieldType GetType() { return mType; }
 
     private:
         FieldType mType;
-        ulib::u8string mStrVal;
+        ulib::string mStrVal;
         uint64 mIntVal;
     };
 
@@ -60,7 +55,7 @@ namespace xdb
         Row() {}
         Row(const Fields &fields, const ulib::List<Value> &values) : mFields(fields), mValues(values) {}
 
-        Value Get(ulib::u8string_view name) const;
+        Value Get(ulib::string_view name) const;
         Value Get(size_t i) const;
 
         const ulib::List<Value> &Values() const { return mValues; }
@@ -96,22 +91,22 @@ namespace xdb
     class Connection
     {
     public:
-        Connection(ulib::u8string_view host, ulib::u8string_view user, ulib::u8string_view password,
-                   ulib::u8string_view db, ushort port);
+        Connection(ulib::string_view host, ulib::string_view user, ulib::string_view password,
+                   ulib::string_view db, ushort port);
         Connection(Connection &&conn);
         ~Connection();
 
         template <typename... T>
-        Result Select(ulib::u8string_view fmt, T &&...args)
+        Result Select(ulib::string_view fmt, T &&...args)
         {
-            ulib::u8string query = ulib::format(fmt, args...);
+            ulib::string query = ulib::format(fmt, args...);
             return SelectImpl(query);
         }
 
         template <typename... T>
-        Row Single(ulib::u8string_view fmt, T &&...args)
+        Row Single(ulib::string_view fmt, T &&...args)
         {
-            ulib::u8string query = ulib::format(fmt, args...);
+            ulib::string query = ulib::format(fmt, args...);
             auto result = SelectImpl(query);
 
             if (result.GetRows().Empty())
@@ -121,9 +116,9 @@ namespace xdb
         }
 
         template <typename... T>
-        Value Scalar(ulib::u8string_view fmt, T &&...args)
+        Value Scalar(ulib::string_view fmt, T &&...args)
         {
-            ulib::u8string query = ulib::format(fmt, args...);
+            ulib::string query = ulib::format(fmt, args...);
             auto result = SelectImpl(query);
 
             if (result.GetRows().Empty())
@@ -132,11 +127,11 @@ namespace xdb
             return result.GetRows().At(0).Get(0);
         }
 
-        Result SelectImpl(ulib::u8string_view query);
+        Result SelectImpl(ulib::string_view query);
 
     private:
-        MYSQL *mSQL;
+        void *mSQL;
     };
 
-    inline ulib::u8string str(ulib::u8string_view view);
+    inline ulib::string str(ulib::string_view view);
 } // namespace xdb

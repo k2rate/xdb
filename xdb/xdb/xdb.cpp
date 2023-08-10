@@ -1,22 +1,19 @@
 #pragma once
 
 #include "xdb.h"
-#include "ulib/encodings/utf8/stringview.h"
-#include "ulib/fmt/format.h"
 #include <stdexcept>
 #include <ulib/format.h>
 #include <ulib/list.h>
 #include <ulib/string.h>
-#include <ulib/u8.h>
 
 #include <mysql.h>
 #include <string.h>
 
 namespace xdb
 {
-    ulib::u8string ToString(FieldType type);
+    ulib::string ToString(FieldType type);
 
-    Value::Value(ulib::u8string_view strval)
+    Value::Value(ulib::string_view strval)
     {
         mStrVal = strval;
         mType = FieldType::String;
@@ -28,7 +25,7 @@ namespace xdb
         mType = FieldType::Int;
     }
 
-    ulib::u8string Value::AsString() const
+    ulib::string Value::AsString() const
     {
         if (mType == FieldType::Int)
         {
@@ -49,7 +46,7 @@ namespace xdb
         throw std::runtime_error("Invalid MYSQL type [is not an integer]");
     }
 
-    Value Row::Get(ulib::u8string_view name) const
+    Value Row::Get(ulib::string_view name) const
     {
         size_t index = 0;
         for (auto field : mFields)
@@ -71,16 +68,16 @@ namespace xdb
         return mValues.At(i);
     }
 
-    Connection::Connection(ulib::u8string_view host, ulib::u8string_view user, ulib::u8string_view password,
-                           ulib::u8string_view db, ushort port)
+    Connection::Connection(ulib::string_view host, ulib::string_view user, ulib::string_view password,
+                           ulib::string_view db, ushort port)
     {
         mSQL = mysql_init(nullptr);
         if (!mSQL)
             throw std::runtime_error("mysql init failed");
 
-        if (!mysql_real_connect(mSQL, ulib::str(host).c_str(), ulib::str(user).c_str(), ulib::str(password).c_str(),
+        if (!mysql_real_connect((MYSQL *)mSQL, ulib::str(host).c_str(), ulib::str(user).c_str(), ulib::str(password).c_str(),
                                 ulib::str(db).c_str(), port, nullptr, 0))
-            throw std::runtime_error(ulib::format("mysql_real_connect failed: {}", mysql_error(mSQL)));
+            throw std::runtime_error(ulib::format("mysql_real_connect failed: {}", mysql_error((MYSQL *)mSQL)));
     }
 
     Connection::Connection(Connection &&conn)
@@ -89,18 +86,18 @@ namespace xdb
         conn.mSQL = nullptr;
     }
 
-    Connection::~Connection() { mysql_close(mSQL); }
+    Connection::~Connection() { mysql_close((MYSQL *)mSQL); }
 
-    Result Connection::SelectImpl(ulib::u8string_view query)
+    Result Connection::SelectImpl(ulib::string_view query)
     {
-        if (mysql_query(mSQL, ulib::str(query).c_str()) != 0)
-            throw std::runtime_error(ulib::format("mysql_query failed: {}", mysql_error(mSQL)));
+        if (mysql_query((MYSQL *)mSQL, ulib::str(query).c_str()) != 0)
+            throw std::runtime_error(ulib::format("mysql_query failed: {}", mysql_error((MYSQL *)mSQL)));
 
-        MYSQL_RES *result = mysql_store_result(mSQL);
+        MYSQL_RES *result = mysql_store_result((MYSQL *)mSQL);
         if (!result)
         {
-            if (mysql_errno(mSQL) != 0)
-                throw std::runtime_error(ulib::format("mysql_store_result failed: {}", mysql_error(mSQL)));
+            if (mysql_errno((MYSQL *)mSQL) != 0)
+                throw std::runtime_error(ulib::format("mysql_store_result failed: {}", mysql_error((MYSQL *)mSQL)));
 
             return Result{};
         }
@@ -130,7 +127,7 @@ namespace xdb
                 throw std::runtime_error(ulib::format("undefined field type: {}", (int)field->type));
             }
 
-            fields.PushBack(Field{ulib::u8(field->name), type});
+            fields.PushBack(Field{field->name, type});
         }
 
         Rows rows;
@@ -147,11 +144,11 @@ namespace xdb
 
                 if (type == FieldType::String)
                 {
-                    values.Add(Value(ulib::u8string_view((char8 *)data, length)));
+                    values.Add(Value(ulib::string_view(data, length)));
                 }
                 else if (type == FieldType::Int)
                 {
-                    values.Add(Value(std::stoll(ulib::u8string_view((char8 *)data, length))));
+                    values.Add(Value(std::stoll(ulib::string_view(data, length))));
                 }
                 else
                 {
@@ -165,9 +162,9 @@ namespace xdb
         return Result(rows.Size(), numFields, fields, rows);
     }
 
-    ulib::u8string str(ulib::u8string_view view)
+    ulib::string str(ulib::string_view view)
     {
-        ulib::u8string escaped;
+        ulib::string escaped;
         for (auto ch : view)
         {
             if (ch == '\'' || ch == '\"')
