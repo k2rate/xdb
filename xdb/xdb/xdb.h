@@ -199,5 +199,5 @@ namespace xdb
         std::function<void(ulib::string_view)> mQueryListener;
     };
 
-    inline ulib::string str(ulib::string_view view);
+    ulib::string str(ulib::string_view view);
 } // namespace xdb
