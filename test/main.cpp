@@ -6,9 +6,10 @@ int main()
 {
     try
     {
+        fmt::print("{}\n", xdb::str("dsaf"));
         xdb::Connection sql(u8"localhost", u8"root", u8"", u8"laravel", 3306);
-        xdb::str("dsaf");
         
+
         if (sql.Scalar(u8"select count(*) FROM users WHERE id = 1").AsInt())
         {
             fmt::print("table users is exists\n");

@@ -177,6 +177,8 @@ namespace xdb
         for (auto ch : view)
         {
             if (ch == '\'' || ch == '\"')
+                escaped.append("\\\"");
+            else
                 escaped.push_back(ch);
         }
 
