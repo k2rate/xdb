@@ -62,7 +62,7 @@ namespace xdb
 
     Value Row::Get(size_t i) const
     {
-        if(mValues.Size() <= i)
+        if (mValues.Size() <= i)
             throw std::runtime_error("Row::Get length error");
 
         return mValues.At(i);
@@ -75,8 +75,8 @@ namespace xdb
         if (!mSQL)
             throw std::runtime_error("mysql init failed");
 
-        if (!mysql_real_connect((MYSQL *)mSQL, ulib::str(host).c_str(), ulib::str(user).c_str(), ulib::str(password).c_str(),
-                                ulib::str(db).c_str(), port, nullptr, 0))
+        if (!mysql_real_connect((MYSQL *)mSQL, ulib::str(host).c_str(), ulib::str(user).c_str(),
+                                ulib::str(password).c_str(), ulib::str(db).c_str(), port, nullptr, 0))
             throw std::runtime_error(ulib::format("mysql_real_connect failed: {}", mysql_error((MYSQL *)mSQL)));
     }
 
@@ -160,6 +160,12 @@ namespace xdb
         }
 
         return Result(rows.Size(), numFields, fields, rows);
+    }
+
+    void Connection::QueryImpl(ulib::string_view query)
+    {
+        if (mysql_query((MYSQL *)mSQL, ulib::str(query).c_str()) != 0)
+            throw std::runtime_error(ulib::format("mysql_query failed: {}", mysql_error((MYSQL *)mSQL)));
     }
 
     ulib::string str(ulib::string_view view)

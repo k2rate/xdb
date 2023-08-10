@@ -97,6 +97,13 @@ namespace xdb
         ~Connection();
 
         template <typename... T>
+        void Query(ulib::string_view fmt, T &&...args)
+        {
+            ulib::string query = ulib::format(fmt, args...);
+            QueryImpl(query);
+        }
+
+        template <typename... T>
         Result Select(ulib::string_view fmt, T &&...args)
         {
             ulib::string query = ulib::format(fmt, args...);
@@ -128,6 +135,7 @@ namespace xdb
         }
 
         Result SelectImpl(ulib::string_view query);
+        void QueryImpl(ulib::string_view query);
 
     private:
         void *mSQL;
