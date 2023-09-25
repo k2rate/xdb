@@ -7,8 +7,10 @@ int main()
     try
     {
         fmt::print("{}\n", xdb::str("dsaf"));
-        xdb::Connection sql(u8"localhost", u8"root", u8"", u8"laravel", 3306);
-        
+        xdb::Connection sql(u8"localhost", u8"root", u8"", u8"conditer11", 3306);
+
+        fmt::print("categories: {}\n", sql.IsTableExists("categories"));
+        fmt::print("plakmp: {}\n", sql.IsTableExists("plakmp"));
 
         if (sql.Scalar(u8"select count(*) FROM users WHERE id = 1").AsInt())
         {

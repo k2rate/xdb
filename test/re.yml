@@ -3,3 +3,9 @@ name: .test
 
 deps:
   - xdb
+
+cxx-build-flags:
+  compiler:
+    - "/GL /O2 /Oi /Gy"
+  linker:
+    - "/LTCG /OPT:REF /OPT:ICF"

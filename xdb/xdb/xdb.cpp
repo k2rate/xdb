@@ -78,15 +78,29 @@ namespace xdb
         if (!mysql_real_connect((MYSQL *)mSQL, ulib::str(host).c_str(), ulib::str(user).c_str(),
                                 ulib::str(password).c_str(), ulib::str(db).c_str(), port, nullptr, 0))
             throw std::runtime_error(ulib::format("mysql_real_connect failed: {}", mysql_error((MYSQL *)mSQL)));
+
+        mSchemaName = db;
+        mQueryListener = [](ulib::string_view){
+            // nothing
+        };
     }
 
     Connection::Connection(Connection &&conn)
     {
         mSQL = conn.mSQL;
         conn.mSQL = nullptr;
+
+        mQueryListener = std::move(conn.mQueryListener);
+        mSchemaName = std::move(mSchemaName);
     }
 
-    Connection::~Connection() { mysql_close((MYSQL *)mSQL); }
+    Connection::~Connection()
+    {
+        if (mSQL)
+        {
+            mysql_close((MYSQL *)mSQL);
+        }
+    }
 
     Result Connection::SelectImpl(ulib::string_view query)
     {
@@ -169,6 +183,18 @@ namespace xdb
         mQueryListener(query);
         if (mysql_query((MYSQL *)mSQL, ulib::str(query).c_str()) != 0)
             throw std::runtime_error(ulib::format("mysql_query failed: {}", mysql_error((MYSQL *)mSQL)));
+    }
+
+    bool Connection::IsTableExists(ulib::string_view name)
+    {
+        uint64 count =
+            this->Scalar("SELECT COUNT(TABLE_SCHEMA) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{}' "
+                         "AND TABLE_NAME = '{}'",
+                         mSchemaName, name)
+                .AsInt();
+        if (count > 0)
+            return true;
+        return false;
     }
 
     ulib::string str(ulib::string_view view)
