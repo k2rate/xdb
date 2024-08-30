@@ -4,14 +4,15 @@ name: .tests
 load-context.!standalone:
   enabled: false
 
-platform.linux|osx:
-  cxx-global-link-deps:
-    - pthread
+load-context.standalone:
+  platform.linux|osx:
+    cxx-global-link-deps:
+      - pthread
 
-platform.windows:
-  deps:
-    - vcpkg:gtest @ static-md
+  platform.windows:
+    deps:
+      - vcpkg:gtest @ static-md
 
-platform.!windows:
-  deps:
-    - vcpkg:gtest
+  platform.!windows:
+    deps:
+      - vcpkg:gtest

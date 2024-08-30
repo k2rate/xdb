@@ -1,11 +1,15 @@
 type: executable
 name: .test
 
-deps:
-  - xdb
+load-context.!standalone:
+  enabled: false
 
-cxx-build-flags:
-  compiler:
-    - "/GL /O2 /Oi /Gy"
-  linker:
-    - "/LTCG /OPT:REF /OPT:ICF"
+load-context.standalone:
+  deps:
+    - xdb
+
+  cxx-build-flags:
+    compiler:
+      - "/GL /O2 /Oi /Gy"
+    linker:
+      - "/LTCG /OPT:REF /OPT:ICF"

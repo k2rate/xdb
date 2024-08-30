@@ -99,6 +99,9 @@ configurations = current_launch + configurations
 
 data = {'version': '0.2.0', 'configurations': configurations}
 
+from pathlib import Path
+Path("./.vscode/").mkdir(parents=True, exist_ok=True)
+
 with open('.vscode/launch.json', 'w') as outfile:
     outfile.write(json.dumps(data, indent=4))
 

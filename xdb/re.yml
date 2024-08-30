@@ -2,8 +2,8 @@ type: static-library
 name: xdb
 
 deps:
-  - github:k2rate/ulib ^5.0.0 [/ulib]
-  - github:k2rate/ulib-fmt ^5.0.0 [/ulib-fmt]
+  - github:k2rate/ulib ^5.0.0
+  - github:k2rate/ulib-fmt ^5.0.0
   - conan:mysql-connector-c@6.1.11 [shared]
 
 cxxenv.msvc:
